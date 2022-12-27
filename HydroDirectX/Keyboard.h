@@ -24,10 +24,10 @@ public:
 			type( Type::Invalid ),
 			code( 0u )
 		{}
-		Event(Type type, unsigned char code) noexcept
+		Event( Type type,unsigned char code ) noexcept
 			:
-			type(type),
-			code(code)
+			type( type ),
+			code( code )
 		{}
 		bool IsPress() const noexcept
 		{

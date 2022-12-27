@@ -42,6 +42,9 @@ HINSTANCE Window::WindowClass::GetInstance() noexcept
 
 //Window Stuff
 Window::Window( int width,int height,const char* name )
+	:
+	width( width ),
+	height( height )
 {
 	//Calculat Window Size
 	RECT wr;
@@ -49,7 +52,7 @@ Window::Window( int width,int height,const char* name )
 	wr.right = width + wr.left;
 	wr.top = 100;
 	wr.bottom = height + wr.top;
-	if(FAILED( AdjustWindowRect( &wr,WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,FALSE ) ))
+	if( AdjustWindowRect( &wr,WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,FALSE ) == 0 )
 	{
 		throw HYWND_LAST_EXCEPT();
 	}
@@ -57,12 +60,12 @@ Window::Window( int width,int height,const char* name )
 	hWnd = CreateWindow(
 		WindowClass::GetName(),name,
 		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
-		CW_USEDEFAULT,CW_USEDEFAULT, 
-		wr.right - wr.left,wr.bottom - wr.top, 
+		CW_USEDEFAULT,CW_USEDEFAULT,
+		wr.right - wr.left,wr.bottom - wr.top,
 		nullptr,nullptr,WindowClass::GetInstance(),this
 	);
 	//Check for Error
-	if(hWnd == nullptr)
+	if( hWnd == nullptr )
 	{
 		throw HYWND_LAST_EXCEPT();
 	}
@@ -75,10 +78,18 @@ Window::~Window()
 	DestroyWindow( hWnd );
 }
 
+void Window::SetTitle( const std::string title )
+{
+	if( SetWindowText( hWnd,title.c_str() ) == 0 )
+	{
+		throw HYWND_LAST_EXCEPT();
+	}
+}
+
 LRESULT CALLBACK Window::HandleMsgSetup( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept
 {
 	//WM_NCCREATE msg Gets Called When We Use CreateWindow()
-	if(msg == WM_NCCREATE)
+	if( msg == WM_NCCREATE )
 	{
 		//Get ptr To Window Class
 		const CREATESTRUCTW* const pCreate = reinterpret_cast<CREATESTRUCTW*>(lParam);
@@ -104,22 +115,22 @@ LRESULT CALLBACK Window::HandleMsgThunk( HWND hWnd,UINT msg,WPARAM wParam,LPARAM
 
 LRESULT Window::HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept
 {
-	switch(msg)
+	switch( msg )
 	{
 		case WM_CLOSE:
 			PostQuitMessage( 0 );
 			return 0;
-		//Clear Keystate When Window Loses Focus
+			//Clear Keystate When Window Loses Focus
 		case WM_KILLFOCUS:
 			kbd.ClearState();
 			break;
-		/********** KEYBOARD MESSAGES **********/
+			/********** KEYBOARD MESSAGES **********/
 		case WM_KEYDOWN:
 			//SYSKEY Commands Need to be Handeld For ALT ( VM_MENU ) and F10
 		case WM_SYSKEYDOWN:
 			//Filter Auto Repeat
-			if(!(lParam & 0x40000000) || kbd.AutorepeatIsEnabled())
-			{  
+			if( !(lParam & 0x40000000) || kbd.AutorepeatIsEnabled() )
+			{
 				kbd.OnKeyPressed( static_cast<unsigned char>(wParam) );
 			}
 			break;
@@ -130,7 +141,57 @@ LRESULT Window::HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noex
 		case WM_CHAR:
 			kbd.OnChar( static_cast<unsigned char>(wParam) );
 			break;
-		/******** END KEYBOARD MESSAGES ********/
+			/******** END KEYBOARD MESSAGES ********/
+
+			/********** Mouse MESSAGES **********/
+		case WM_MOUSEMOVE:
+		{
+			const POINTS pt = MAKEPOINTS( lParam );
+			//In Window
+			if( pt.x >= 0 && pt.x < width && pt.y >= 0 && pt.y < height )
+			{
+				mouse.OnMouseMove( pt.x,pt.y );
+				if( !mouse.IsInWindow() )
+				{
+					SetCapture( hWnd );
+					mouse.OnMouseEnter();
+				}
+			}
+			//Not in Window ( Maintain Capture if Button is Down )
+			else
+			{
+				if( wParam & (MK_LBUTTON | MK_RBUTTON) )
+				{
+					mouse.OnMouseMove( pt.x,pt.y );
+				}
+				//Button Up ( Release Capture )
+				else
+				{
+					ReleaseCapture();
+					mouse.OnMouseLeave();
+
+				}
+			}
+			break;
+		}
+		case WM_LBUTTONDOWN:
+			mouse.OnLeftPressed();
+			break;
+		case WM_LBUTTONUP:
+			mouse.OnLeftRelease();
+			break;
+		case WM_RBUTTONDOWN:
+			mouse.OnRightPressed();
+			break;
+		case WM_RBUTTONUP:
+			mouse.OnRightRelease();
+			break;
+		case WM_MOUSEWHEEL:
+			mouse.OnWheelDelta( GET_WHEEL_DELTA_WPARAM( wParam ) );
+			break;
+		case WM_MBUTTONDOWN:
+			mouse.OnWheelPressed();
+			break;
 	}
 
 	return DefWindowProc( hWnd,msg,wParam,lParam );
@@ -139,11 +200,11 @@ LRESULT Window::HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noex
 //Window Exception Stuff
 Window::Exception::Exception( int line,const char* file,HRESULT hr ) noexcept
 	:
-	HydroException(line, file),
-	hr(hr)
+	HydroException( line,file ),
+	hr( hr )
 {}
 
-const char* Window::Exception::what() const noexcept 
+const char* Window::Exception::what() const noexcept
 {
 	std::ostringstream oss;
 	oss << GetType() << std::endl
@@ -168,7 +229,7 @@ std::string Window::Exception::TranslateErrorCode( HRESULT hr ) noexcept
 		nullptr,hr,MAKELANGID( LANG_NEUTRAL,SUBLANG_DEFAULT ),
 		reinterpret_cast<LPSTR>(&pMsgBuf),0,nullptr
 	);
-	if(nMsgLen == 0)
+	if( nMsgLen == 0 )
 	{
 		return "Unidentified error code";
 

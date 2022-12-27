@@ -1,5 +1,5 @@
 #include "Window.h"
-
+#include <sstream>
 int CALLBACK WinMain(
 	_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevIstance,
@@ -9,24 +9,30 @@ int CALLBACK WinMain(
 	try
 	{
 		//Create Window
-		Window wnd( 800,600, "Hydro DirectX" );
+		Window wnd( 800,600,"Hydro DirectX" );
 
 		//Message Handeling
 		MSG msg;
 		BOOL gResult;
 
-		while((gResult = GetMessage( &msg,nullptr,0,0 )) > 0)
+		while( (gResult = GetMessage( &msg,nullptr,0,0 )) > 0 )
 		{
 			TranslateMessage( &msg );
 			DispatchMessage( &msg );
 
-			if(wnd.kbd.KeyIsPressed( VK_MENU ))
+			while( !wnd.mouse.IsEmpty() )
 			{
-				MessageBox( nullptr,"Something happeon!!!","Space was Pressed",MB_OK );
+				auto e = wnd.mouse.Read();
+				if( e.GetType() == Mouse::Event::Type::Move )
+				{
+					std::ostringstream oss;
+					oss << "Mousepos ( " << e.GetPosX() << ", " << e.GetPosY() << " )";
+					wnd.SetTitle( oss.str() );
+				}
 			}
 		}
 
-		if(gResult == -1)
+		if( gResult == -1 )
 		{
 			return -1;
 		}
@@ -35,17 +41,17 @@ int CALLBACK WinMain(
 			return (int)msg.wParam;
 		}
 	}
-	catch(const HydroException& e)
+	catch( const HydroException& e )
 	{
 		MessageBox( nullptr,e.what(),e.GetType(),MB_OK | MB_ICONEXCLAMATION );
 	}
-	catch(const std::exception& e)
+	catch( const std::exception& e )
 	{
 		MessageBox( nullptr,e.what(),"Standrard Exception",MB_OK | MB_ICONEXCLAMATION );
 	}
 	catch( ... )
 	{
-		MessageBox( nullptr,"No details available","Unkown Exception", MB_OK | MB_ICONEXCLAMATION );
+		MessageBox( nullptr,"No details available","Unkown Exception",MB_OK | MB_ICONEXCLAMATION );
 	}
 	return -1;
 }
