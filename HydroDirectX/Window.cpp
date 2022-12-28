@@ -86,6 +86,26 @@ void Window::SetTitle( const std::string title )
 	}
 }
 
+std::optional<int> Window::ProcessMessages()
+{
+	MSG msg;
+
+	while( PeekMessage( &msg,nullptr,0,0,PM_REMOVE ) )
+	{
+		if( msg.message == WM_QUIT )
+		{
+			//Return Exit Code When Quting
+			return msg.wParam;
+		}
+
+		TranslateMessage( &msg );
+		DispatchMessage( &msg );
+	}
+
+	//Return Empty Optinal When Not Quiting
+	return {};
+}
+
 LRESULT CALLBACK Window::HandleMsgSetup( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept
 {
 	//WM_NCCREATE msg Gets Called When We Use CreateWindow()

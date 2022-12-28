@@ -1,4 +1,6 @@
 #include "App.h"
+#include <sstream>
+#include <iomanip>
 
 App::App()
 	:
@@ -8,27 +10,23 @@ App::App()
 
 int App::Go()
 {
-	MSG msg;
-	BOOL gResult;
-
-	while( (gResult = GetMessage( &msg,nullptr,0,0 )) > 0 )
+	while( true )
 	{
-		TranslateMessage( &msg );
-		DispatchMessage( &msg );
-
+		//Proccess Messages
+		if( const auto ecode = Window::ProcessMessages() )
+		{
+			//Return With Exit Code of ecode
+			return ecode.value();
+		}
 		DoFrame();
 	}
-
-	if( gResult == -1 )
-	{
-		throw HYWND_LAST_EXCEPT();
-	}
-
-	return (int)msg.wParam;
 	
 }
 
 void App::DoFrame()
 {
-
+	const float t = timer.Peek();
+	std::ostringstream oss;
+	oss << "Time elapsed: " << std::setprecision( 1 ) << std::fixed << t << "s";
+	wnd.SetTitle( oss.str() );
 }

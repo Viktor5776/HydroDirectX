@@ -1,5 +1,6 @@
 #pragma once
 #include "Window.h"
+#include "HydroTimer.h"
 
 class App
 {
@@ -11,4 +12,5 @@ private:
 	void DoFrame();
 private:
 	Window wnd;
+	HydroTimer timer;
 };
