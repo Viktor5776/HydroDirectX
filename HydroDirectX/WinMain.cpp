@@ -1,5 +1,4 @@
-#include "Window.h"
-#include <sstream>
+#include "App.h"
 int CALLBACK WinMain(
 	_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevIstance,
@@ -8,38 +7,7 @@ int CALLBACK WinMain(
 {
 	try
 	{
-		//Create Window
-		Window wnd( 800,600,"Hydro DirectX" );
-
-		//Message Handeling
-		MSG msg;
-		BOOL gResult;
-
-		while( (gResult = GetMessage( &msg,nullptr,0,0 )) > 0 )
-		{
-			TranslateMessage( &msg );
-			DispatchMessage( &msg );
-
-			while( !wnd.mouse.IsEmpty() )
-			{
-				auto e = wnd.mouse.Read();
-				if( e.GetType() == Mouse::Event::Type::Move )
-				{
-					std::ostringstream oss;
-					oss << "Mousepos ( " << e.GetPosX() << ", " << e.GetPosY() << " )";
-					wnd.SetTitle( oss.str() );
-				}
-			}
-		}
-
-		if( gResult == -1 )
-		{
-			return -1;
-		}
-		else
-		{
-			return (int)msg.wParam;
-		}
+		return App{}.Go();
 	}
 	catch( const HydroException& e )
 	{
