@@ -1,6 +1,4 @@
 #include "App.h"
-#include <sstream>
-#include <iomanip>
 
 App::App()
 	:
@@ -25,8 +23,8 @@ int App::Go()
 
 void App::DoFrame()
 {
-	const float t = timer.Peek();
-	std::ostringstream oss;
-	oss << "Time elapsed: " << std::setprecision( 1 ) << std::fixed << t << "s";
-	wnd.SetTitle( oss.str() );
+	const float s = sin( timer.Peek() ) / 2.0 + 0.3f;
+	const float c = cos( timer.Peek() ) / 2.0 + 0.3f;
+	wnd.Gfx().ClearBuffer( s,1.0f,s );
+	wnd.Gfx().EndFrame();
 }

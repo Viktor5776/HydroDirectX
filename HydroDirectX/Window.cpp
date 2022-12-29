@@ -56,6 +56,7 @@ Window::Window( int width,int height,const char* name )
 	{
 		throw HYWND_LAST_EXCEPT();
 	}
+
 	//Create Window and Get hWnd
 	hWnd = CreateWindow(
 		WindowClass::GetName(),name,
@@ -64,13 +65,18 @@ Window::Window( int width,int height,const char* name )
 		wr.right - wr.left,wr.bottom - wr.top,
 		nullptr,nullptr,WindowClass::GetInstance(),this
 	);
+
 	//Check for Error
 	if( hWnd == nullptr )
 	{
 		throw HYWND_LAST_EXCEPT();
 	}
-	//Show Window
+
+	//Show Window ( Defualt Behaivor is Hidden )
 	ShowWindow( hWnd,SW_SHOWDEFAULT );
+
+	//Create Graphics Object
+	pGfx = std::make_unique<Graphics>( hWnd );
 }
 
 Window::~Window()
@@ -104,6 +110,11 @@ std::optional<int> Window::ProcessMessages()
 
 	//Return Empty Optinal When Not Quiting
 	return {};
+}
+
+Graphics& Window::Gfx()
+{
+	return *pGfx;
 }
 
 LRESULT CALLBACK Window::HandleMsgSetup( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept
