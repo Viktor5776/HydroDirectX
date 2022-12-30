@@ -23,6 +23,17 @@ int App::Go()
 
 void App::DoFrame()
 {
+	while( !wnd.mouse.IsEmpty() )
+			{
+				auto e = wnd.mouse.Read();
+				if( e.GetType() == Mouse::Event::Type::Move )
+				{
+					std::ostringstream oss;
+					oss << "Mousepos ( " << e.GetPosX() << ", " << e.GetPosY() << " )";
+					wnd.SetTitle( oss.str() );
+				}
+			}
+
 	const float s = sin( timer.Peek() ) / 2.0 + 0.3f;
 	const float c = cos( timer.Peek() ) / 2.0 + 0.3f;
 	wnd.Gfx().ClearBuffer( s,1.0f,s );
