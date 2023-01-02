@@ -16,6 +16,9 @@
     <Filter Include="Dxerr">
       <UniqueIdentifier>{f16d1527-392e-4ecb-a09a-985a4f45a950}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{62a908c6-751e-4613-a2d2-02197b6e785f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -74,11 +77,11 @@
     <ClInclude Include="Graphics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dxerr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DxgiInfoManager.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dxerr.h">
+      <Filter>Dxerr</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -101,5 +104,13 @@
     <None Include="DXGetErrorString.inl">
       <Filter>Dxerr</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="VertexShader.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="PixelShader.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

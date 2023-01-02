@@ -101,7 +101,7 @@ std::optional<int> Window::ProcessMessages() noexcept
 		if( msg.message == WM_QUIT )
 		{
 			//Return Exit Code When Quting
-			return msg.wParam;
+			return (int)msg.wParam;
 		}
 
 		TranslateMessage( &msg );
