@@ -2,7 +2,7 @@
 
 App::App()
 	:
-	wnd( 1920,1048,"Hydro DirectX" )
+	wnd( 800,600,"Hydro DirectX" )
 {
 }
 
@@ -23,20 +23,9 @@ int App::Go()
 
 void App::DoFrame()
 {
-
-	while( !wnd.mouse.IsEmpty() )
-			{
-				auto e = wnd.mouse.Read();
-				if( e.GetType() == Mouse::Event::Type::Move )
-				{
-					std::ostringstream oss;
-					oss << "Mousepos ( " << e.GetPosX() << ", " << e.GetPosY() << " )";
-					wnd.SetTitle( oss.str() );
-					y = (1.0f - e.GetPosY() / 1048.0f) + (e.GetPosY() / 1048.0f) * -1.0f;
-				}
-			}
-
-	wnd.Gfx().ClearBuffer( 0.0f,0.15f,0.2f );
-	wnd.Gfx().DrawTestTriangle(y);
+	const float s = sin( timer.Peek() ) / 2.0f + 0.5f;
+	wnd.Gfx().ClearBuffer( s,s,1.0f );
+	wnd.Gfx().DrawTestTriangle( -timer.Peek(),0.0f,0.0f );
+	wnd.Gfx().DrawTestTriangle( timer.Peek(),wnd.mouse.GetPosX() / 400.0f - 1.0f, -wnd.mouse.GetPosY() / 300.0f + 1.0f);
 	wnd.Gfx().EndFrame();
 }

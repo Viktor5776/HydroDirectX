@@ -13,5 +13,4 @@ private:
 private:
 	Window wnd;
 	HydroTimer timer;
-	float y = 0.0f;
 };
