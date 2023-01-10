@@ -14,7 +14,8 @@ GDIPlusManager gdipm;
 
 App::App()
 	:
-	wnd( 800,600,"Hydro DirectX" )
+	wnd( 800,600,"Hydro DirectX" ),
+	sprite( wnd.Gfx(),-0.25f,0.125f )
 {
 	class Factory
 	{
@@ -86,6 +87,7 @@ void App::DoFrame()
 		d->Update( wnd.kbd.KeyIsPressed(VK_SPACE) ? 0.0f : dt );
 		d->Draw( wnd.Gfx() );
 	}
+	sprite.Draw( wnd.Gfx() );
 	wnd.Gfx().EndFrame();
 }
 
