@@ -1,5 +1,6 @@
 #include "DxgiInfoManager.h"
 #include "WindowsThrowMacros.h"
+#include "GraphicsThrowMacros.h"
 #include "Window.h"
 #include "Graphics.h"
 #include <dxgidebug.h>
