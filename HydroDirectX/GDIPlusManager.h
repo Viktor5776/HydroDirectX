@@ -1,5 +1,6 @@
 #pragma once
 #include "HydroWin.h"
+#include <string>
 
 class GDIPlusManager
 {
