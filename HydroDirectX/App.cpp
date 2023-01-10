@@ -3,8 +3,12 @@
 #include "Melon.h"
 #include "Pyramid.h"
 #include "HydroMath.h"
+#include "Surface.h"
+#include "GDIPlusManager.h"
 #include <memory>
 #include <algorithm>
+
+GDIPlusManager gdipm;
 
 App::App()
 	:
@@ -59,6 +63,8 @@ App::App()
 	std::generate_n( std::back_inserter( drawables ),nDrawables,f );
 
 	wnd.Gfx().SetProjection( DirectX::XMMatrixPerspectiveLH( 1.0f,3.0f / 4.0f,0.5f,40.0f ) );
+
+	const auto s = Surface::FromFile( "Images\\HydroDirectX32x32.png" );
 }
 
 void App::DoFrame()
