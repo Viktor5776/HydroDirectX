@@ -7,6 +7,9 @@
 #include "HydroMath.h"
 #include "Surface.h"
 #include "GDIPlusManager.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_win32.h"
+#include "imgui/imgui_impl_dx11.h"
 #include <memory>
 #include <algorithm>
 
@@ -14,8 +17,7 @@ GDIPlusManager gdipm;
 
 App::App()
 	:
-	wnd( 800,600,"Hydro DirectX" ),
-	sprite( wnd.Gfx(),-0.25f,0.125f )
+	wnd( 800,600,"Hydro DirectX" )
 {
 	class Factory
 	{
@@ -81,13 +83,29 @@ App::App()
 void App::DoFrame()
 {
 	const auto dt = timer.Mark();
-	wnd.Gfx().ClearBuffer( 0.07f,0.0f,0.12f );
+	wnd.Gfx().BeginFrame( 0.07f,0.0f,0.12f );
+	
 	for( auto& d : drawables )
 	{
 		d->Update( wnd.kbd.KeyIsPressed(VK_SPACE) ? 0.0f : dt );
 		d->Draw( wnd.Gfx() );
 	}
-	sprite.Draw( wnd.Gfx() );
+
+	if( wnd.kbd.KeyIsPressed( VK_SPACE ) )
+	{
+		wnd.Gfx().DisableImgui();
+	}
+	else
+	{
+		wnd.Gfx().EnableImgui();
+	}
+
+	if( show_demo_window )
+	{
+		ImGui::ShowDemoWindow( &show_demo_window );
+	}
+
+	//Present Frame
 	wnd.Gfx().EndFrame();
 }
 

@@ -1,6 +1,8 @@
 #include "Graphics.h"
 #include "GraphicsThrowMacros.h"
 #include "dxerr.h"
+#include "imgui/imgui_impl_dx11.h"
+#include "imgui/imgui_impl_win32.h"
 #include <sstream>
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
@@ -11,6 +13,8 @@
 
 
 Graphics::Graphics( HWND hWnd )
+	:
+	projection( DirectX::XMMatrixIdentity() )
 {
 	DXGI_SWAP_CHAIN_DESC sd = {};
 	sd.BufferDesc.Width = 0;
@@ -94,7 +98,7 @@ Graphics::Graphics( HWND hWnd )
 	pContext->OMSetRenderTargets( 1u,pTarget.GetAddressOf(),pDSV.Get() );
 
 	//Configure Viewport
-	D3D11_VIEWPORT vp;
+	D3D11_VIEWPORT vp = {};
 	vp.Width = 800.0f;
 	vp.Height = 600.0f;
 	vp.MinDepth = 0.0f;
@@ -102,10 +106,20 @@ Graphics::Graphics( HWND hWnd )
 	vp.TopLeftX = 0.0f;
 	vp.TopLeftY = 0.0f;
 	pContext->RSSetViewports( 1u,&vp );
+
+	//Init Imgui D3D Implementation
+	ImGui_ImplDX11_Init( pDevice.Get(),pContext.Get() );
 }
 
 void Graphics::EndFrame()
 {
+	//Imgui Frame End
+	if( imguiEnabled )
+	{
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData( ImGui::GetDrawData() );
+	}
+
 	HRESULT hr;
 #ifndef NDEBUG
 	infoManager.Set();
@@ -123,8 +137,16 @@ void Graphics::EndFrame()
 	}
 }
 
-void Graphics::ClearBuffer( float red,float green,float blue ) noexcept
+void Graphics::BeginFrame( float red,float green,float blue ) noexcept
 {
+	//Imgui Begin Frame
+	if( imguiEnabled )
+	{
+		ImGui_ImplDX11_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+	}
+
 	const float color[] = { red,green,blue,1.0f };
 	pContext->ClearRenderTargetView( pTarget.Get(),color);
 	pContext->ClearDepthStencilView( pDSV.Get(),D3D11_CLEAR_DEPTH,1.0f,0u );
@@ -143,6 +165,21 @@ void Graphics::SetProjection( DirectX::FXMMATRIX proj ) noexcept
 DirectX::XMMATRIX Graphics::GetProjection() const noexcept
 {
 	return projection;
+}
+
+void Graphics::EnableImgui() noexcept
+{
+	imguiEnabled = true;
+}
+
+void Graphics::DisableImgui() noexcept
+{
+	imguiEnabled = false;
+}
+
+bool Graphics::IsImguiEnabled() const noexcept
+{
+	return imguiEnabled;
 }
 
 // Graphics Exception stuff
