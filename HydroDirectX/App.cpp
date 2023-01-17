@@ -82,7 +82,7 @@ App::App()
 
 void App::DoFrame()
 {
-	const auto dt = timer.Mark();
+	const auto dt = timer.Mark() * speed_factor;
 	wnd.Gfx().BeginFrame( 0.07f,0.0f,0.12f );
 	
 	for( auto& d : drawables )
@@ -91,19 +91,15 @@ void App::DoFrame()
 		d->Draw( wnd.Gfx() );
 	}
 
-	if( wnd.kbd.KeyIsPressed( VK_SPACE ) )
-	{
-		wnd.Gfx().DisableImgui();
-	}
-	else
-	{
-		wnd.Gfx().EnableImgui();
-	}
+	static char buffer[1024];
 
-	if( show_demo_window )
+	//Imgui Window to Control Simulation Speed
+	if( ImGui::Begin( "Simulation Speed" ) )
 	{
-		ImGui::ShowDemoWindow( &show_demo_window );
+		ImGui::SliderFloat( "Speed Factor",&speed_factor,-5.0f,5.0f );
+		ImGui::Text( "Application average %.3f ms/frame (%.1f FPS)",1000.0f / ImGui::GetIO().Framerate,ImGui::GetIO().Framerate );
 	}
+	ImGui::End();
 
 	//Present Frame
 	wnd.Gfx().EndFrame();

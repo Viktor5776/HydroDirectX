@@ -160,6 +160,8 @@ LRESULT Window::HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noex
 	{
 		return true;
 	}
+	const auto imio = ImGui::GetIO();
+
 
 	switch( msg )
 	{
@@ -174,6 +176,11 @@ LRESULT Window::HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noex
 		case WM_KEYDOWN:
 			//SYSKEY Commands Need to be Handeld For ALT ( VM_MENU ) and F10
 		case WM_SYSKEYDOWN:
+			//Remove Message if Imgui Wants to Capture
+			if( imio.WantCaptureKeyboard )
+			{
+				break;
+			}
 			//Filter Auto Repeat
 			if( !(lParam & 0x40000000) || kbd.AutorepeatIsEnabled() )
 			{
@@ -182,15 +189,30 @@ LRESULT Window::HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noex
 			break;
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
+			//Remove Message if Imgui Wants to Capture
+			if( imio.WantCaptureKeyboard )
+			{
+				break;
+			}
 			kbd.OnKeyReleased( static_cast<unsigned char>(wParam) );
 			break;
 		case WM_CHAR:
+			//Remove Message if Imgui Wants to Capture
+			if( imio.WantCaptureKeyboard )
+			{
+				break;
+			}
 			kbd.OnChar( static_cast<unsigned char>(wParam) );
 			break;
 			/******** END KEYBOARD MESSAGES ********/
 
 			/********** Mouse MESSAGES **********/
 		case WM_MOUSEMOVE:
+			//Remove Message if Imgui Wants to Capture
+			if( imio.WantCaptureKeyboard )
+			{
+				break;
+			}
 			if( GetFocus() == hWnd )
 			{
 				const POINTS pt = MAKEPOINTS( lParam );
@@ -222,21 +244,51 @@ LRESULT Window::HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noex
 			}
 			break;
 		case WM_LBUTTONDOWN:
+			//Remove Message if Imgui Wants to Capture
+			if( imio.WantCaptureKeyboard )
+			{
+				break;
+			}
 			mouse.OnLeftPressed();
 			break;
 		case WM_LBUTTONUP:
+			//Remove Message if Imgui Wants to Capture
+			if( imio.WantCaptureKeyboard )
+			{
+				break;
+			}
 			mouse.OnLeftRelease();
 			break;
 		case WM_RBUTTONDOWN:
+			//Remove Message if Imgui Wants to Capture
+			if( imio.WantCaptureKeyboard )
+			{
+				break;
+			}
 			mouse.OnRightPressed();
 			break;
 		case WM_RBUTTONUP:
+			//Remove Message if Imgui Wants to Capture
+			if( imio.WantCaptureKeyboard )
+			{
+				break;
+			}
 			mouse.OnRightRelease();
 			break;
 		case WM_MOUSEWHEEL:
+			//Remove Message if Imgui Wants to Capture
+			if( imio.WantCaptureKeyboard )
+			{
+				break;
+			}
 			mouse.OnWheelDelta( GET_WHEEL_DELTA_WPARAM( wParam ) );
 			break;
 		case WM_MBUTTONDOWN:
+			//Remove Message if Imgui Wants to Capture
+			if( imio.WantCaptureKeyboard )
+			{
+				break;
+			}
 			mouse.OnWheelPressed();
 			break;
 	}
