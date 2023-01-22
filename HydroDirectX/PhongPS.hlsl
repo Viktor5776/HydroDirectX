@@ -8,8 +8,8 @@ static const float3 ambient = { 0.15f,0.15f,0.15f };
 static const float3 diffuseColor = { 1.0f,1.0f,1.0f };
 static const float diffuseIntensity = 1.0f;
 static const float attConst = 1.0f;
-static const float attLin = 1.0f;
-static const float attQuad = 1.0f;
+static const float attLin = 0.09f;
+static const float attQuad = 0.032f;
 
 
 float4 main( float3 worldPos : Position, float3 n : Normal ) : SV_Target
@@ -19,7 +19,7 @@ float4 main( float3 worldPos : Position, float3 n : Normal ) : SV_Target
     const float distTol = length( vTol );
     const float3 dirToL = vTol / distTol;
     //Diffuse Attenuation
-    const float att = attConst + attLin * distTol + attQuad * (distTol * distTol);
+    const float att = 1 / (attConst + attLin * distTol + attQuad * (distTol * distTol));
     //Diffuse Intensity
     const float3 diffuse = diffuseColor * diffuseIntensity * att * max( 0.0f, dot( dirToL, n ) );
     //Final Color

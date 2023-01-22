@@ -14,7 +14,7 @@ GDIPlusManager gdipm;
 App::App()
 	:
 	wnd( 800,600,"Hydro DirectX" ),
-	light(wnd.Gfx())
+	light( wnd.Gfx() )
 {
 	class Factory
 	{
