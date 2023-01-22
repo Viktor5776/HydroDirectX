@@ -3,6 +3,7 @@
 #include "HydroTimer.h"
 #include "ImguiManager.h"
 #include "Camera.h"
+#include "PointLight.h"
 
 class App
 {
@@ -18,6 +19,7 @@ private:
 	Window wnd;
 	HydroTimer timer;
 	Camera camera;
+	PointLight light;
 	std::vector<std::unique_ptr<class Drawable>> drawables;
 	float speed_factor = 1.0f;
 	static constexpr size_t nDrawables = 180;
