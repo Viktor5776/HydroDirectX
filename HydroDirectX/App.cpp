@@ -25,9 +25,10 @@ App::App()
 		{}
 		std::unique_ptr<Drawable> operator()()
 		{
+			const DirectX::XMFLOAT3 mat = { cdist( rng ),cdist( rng ) ,cdist( rng ) };
 			return std::make_unique<Box>(
 					gfx,rng,adist,ddist,
-					odist,rdist,bdist
+					odist,rdist,bdist,mat
 			);
 		}
 	private:
@@ -38,6 +39,7 @@ App::App()
 		std::uniform_real_distribution<float> odist{ 0.0f,PI * 0.08f };
 		std::uniform_real_distribution<float> rdist{ 6.0f,20.0f };
 		std::uniform_real_distribution<float> bdist{ 0.4f,3.0f };
+		std::uniform_real_distribution<float> cdist{ 0.0f,1.0f };
 	};
 
 	Factory f( wnd.Gfx() );
@@ -52,7 +54,7 @@ void App::DoFrame()
 	const auto dt = timer.Mark() * speed_factor;
 	wnd.Gfx().SetCamera( camera.GetMatrix() );
 	wnd.Gfx().BeginFrame( 0.07f,0.0f,0.12f );
-	light.Bind( wnd.Gfx() );
+	light.Bind( wnd.Gfx(),camera.GetMatrix() );
 	
 	for( auto& d : drawables )
 	{
