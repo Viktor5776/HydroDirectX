@@ -58,7 +58,7 @@ void App::DoFrame()
 	
 	for( auto& d : drawables )
 	{
-		d->Update( wnd.kbd.KeyIsPressed(	VK_SPACE) ? 0.0f : dt );
+		d->Update( wnd.kbd.KeyIsPressed(VK_SPACE) ? 0.0f : dt );
 		d->Draw( wnd.Gfx() );
 	}
 	light.Draw( wnd.Gfx() );
