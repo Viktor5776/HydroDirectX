@@ -58,10 +58,9 @@ public:
 	template<class V>
 	static IndexedTriangleList<V> MakeTesselatedIndependentFaces( int longDiv )
 	{
-		namespace dx = DirectX;
 		assert( longDiv >= 3 );
 
-		const auto base = dx::XMVectorSet( 1.0f,0.0f,-1.0f,0.0f );
+		const auto base = DirectX::XMVectorSet( 1.0f,0.0f,-1.0f,0.0f );
 		const float longitudeAngle = 2.0f * PI / longDiv;
 
 		std::vector<V> vertices;
@@ -79,11 +78,11 @@ public:
 			for( auto theta : thetas )
 			{
 				vertices.emplace_back();
-				const auto v = dx::XMVector3Transform(
+				const auto v = DirectX::XMVector3Transform(
 					base,
-					dx::XMMatrixRotationZ( theta )
+					DirectX::XMMatrixRotationZ( theta )
 				);
-				dx::XMStoreFloat3( &vertices.back().pos,v );
+				DirectX::XMStoreFloat3( &vertices.back().pos,v );
 			}
 		}
 		// base vertices
@@ -94,11 +93,11 @@ public:
 		for( int iLong = 0; iLong < longDiv; iLong++ )
 		{
 			vertices.emplace_back();
-			auto v = dx::XMVector3Transform(
+			auto v = DirectX::XMVector3Transform(
 				base,
-				dx::XMMatrixRotationZ( longitudeAngle * iLong )
+				DirectX::XMMatrixRotationZ( longitudeAngle * iLong )
 			);
-			dx::XMStoreFloat3( &vertices.back().pos,v );
+			DirectX::XMStoreFloat3( &vertices.back().pos,v );
 		}
 
 		std::vector<unsigned short> indices;

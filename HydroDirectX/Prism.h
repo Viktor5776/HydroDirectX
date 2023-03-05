@@ -81,11 +81,10 @@ public:
 	template<class V>
 	static IndexedTriangleList<V> MakeTesselatedIndependentCapNormals( int longDiv )
 	{
-		namespace dx = DirectX;
 		assert( longDiv >= 3 );
 
-		const auto base = dx::XMVectorSet( 1.0f,0.0f,-1.0f,0.0f );
-		const auto offset = dx::XMVectorSet( 0.0f,0.0f,2.0f,0.0f );
+		const auto base = DirectX::XMVectorSet( 1.0f,0.0f,-1.0f,0.0f );
+		const auto offset = DirectX::XMVectorSet( 0.0f,0.0f,2.0f,0.0f );
 		const float longitudeAngle = 2.0f * PI / longDiv;
 
 		std::vector<V> vertices;
@@ -100,11 +99,11 @@ public:
 		for( int iLong = 0; iLong < longDiv; iLong++ )
 		{
 			vertices.emplace_back();
-			auto v = dx::XMVector3Transform(
+			auto v = DirectX::XMVector3Transform(
 				base,
-				dx::XMMatrixRotationZ( longitudeAngle * iLong )
+				DirectX::XMMatrixRotationZ( longitudeAngle * iLong )
 			);
-			dx::XMStoreFloat3( &vertices.back().pos,v );
+			DirectX::XMStoreFloat3( &vertices.back().pos,v );
 			vertices.back().n = { 0.0f,0.0f,-1.0f };
 		}
 		// far center
@@ -117,12 +116,12 @@ public:
 		for( int iLong = 0; iLong < longDiv; iLong++ )
 		{
 			vertices.emplace_back();
-			auto v = dx::XMVector3Transform(
+			auto v = DirectX::XMVector3Transform(
 				base,
-				dx::XMMatrixRotationZ( longitudeAngle * iLong )
+				DirectX::XMMatrixRotationZ( longitudeAngle * iLong )
 			);
-			v = dx::XMVectorAdd( v,offset );
-			dx::XMStoreFloat3( &vertices.back().pos,v );
+			v = DirectX::XMVectorAdd( v,offset );
+			DirectX::XMStoreFloat3( &vertices.back().pos,v );
 			vertices.back().n = { 0.0f,0.0f,1.0f };
 		}
 		// fusilage vertices
@@ -132,22 +131,22 @@ public:
 			// near base
 			{
 				vertices.emplace_back();
-				auto v = dx::XMVector3Transform(
+				auto v = DirectX::XMVector3Transform(
 					base,
-					dx::XMMatrixRotationZ( longitudeAngle * iLong )
+					DirectX::XMMatrixRotationZ( longitudeAngle * iLong )
 				);
-				dx::XMStoreFloat3( &vertices.back().pos,v );
+				DirectX::XMStoreFloat3( &vertices.back().pos,v );
 				vertices.back().n = { vertices.back().pos.x,vertices.back().pos.y,0.0f };
 			}
 			// far base
 			{
 				vertices.emplace_back();
-				auto v = dx::XMVector3Transform(
+				auto v = DirectX::XMVector3Transform(
 					base,
-					dx::XMMatrixRotationZ( longitudeAngle * iLong )
+					DirectX::XMMatrixRotationZ( longitudeAngle * iLong )
 				);
-				v = dx::XMVectorAdd( v,offset );
-				dx::XMStoreFloat3( &vertices.back().pos,v );
+				v = DirectX::XMVectorAdd( v,offset );
+				DirectX::XMStoreFloat3( &vertices.back().pos,v );
 				vertices.back().n = { vertices.back().pos.x,vertices.back().pos.y,0.0f };
 			}
 		}

@@ -2,6 +2,7 @@
 #include "Box.h"
 #include "Cylinder.h"
 #include "Pyramid.h"
+#include "SkinnedBox.h"
 #include "HydroMath.h"
 #include "Surface.h"
 #include "GDIPlusManager.h"
@@ -45,6 +46,11 @@ App::App()
 						gfx,rng,adist,ddist,odist,
 						rdist,tdist
 						);
+				case 3:
+					return std::make_unique<SkinnedBox>(
+						gfx, rng, adist, ddist,
+						odist, rdist
+						);
 				default:
 					assert( false && "impossible drawable option in factory" );
 					return {};
@@ -53,7 +59,7 @@ App::App()
 	private:
 		Graphics& gfx;
 		std::mt19937 rng{ std::random_device{}() };
-		std::uniform_int_distribution<int> sdist{ 0,2 };
+		std::uniform_int_distribution<int> sdist{ 0,3 };
 		std::uniform_real_distribution<float> adist{ 0.0f,PI * 2.0f };
 		std::uniform_real_distribution<float> ddist{ 0.0f,PI * 0.5f };
 		std::uniform_real_distribution<float> odist{ 0.0f,PI * 0.08f };
@@ -66,6 +72,15 @@ App::App()
 	Factory f( wnd.Gfx() );
 	drawables.reserve( nDrawables );
 	std::generate_n( std::back_inserter( drawables ),nDrawables,f );
+
+	// init box pointers for editing instance parameters
+	for( auto& pd : drawables )
+	{
+		if( auto pb = dynamic_cast<Box*>(pd.get()) )
+		{
+			boxes.push_back( pb );
+		}
+	}
 
 	wnd.Gfx().SetProjection( DirectX::XMMatrixPerspectiveLH( 1.0f,3.0f / 4.0f,0.5f,40.0f ) );
 }
@@ -96,6 +111,39 @@ void App::DoFrame()
 	//Imgui Window to Control Camera And Light
 	camera.SpawnControlWindow();
 	light.SpawnControlWindow();
+	// imgui window to open box windows
+	if( ImGui::Begin( "Boxes" ) )
+	{
+		using namespace std::string_literals;
+		const auto preview = comboBoxIndex ? std::to_string( *comboBoxIndex ) : "Choose a box..."s;
+		if( ImGui::BeginCombo( "Box Number", preview.c_str() ) )
+		{
+			for( int i = 0; i < boxes.size(); i++ )
+			{
+				const bool selected = *comboBoxIndex == i;
+				if( ImGui::Selectable( std::to_string( i ).c_str(), selected ) )
+				{
+					comboBoxIndex = i;
+				}
+				if( selected )
+				{
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+			ImGui::EndCombo();
+		}
+		if( ImGui::Button( "Spawn Control Window" ) && comboBoxIndex )
+		{
+			boxControlIds.insert( *comboBoxIndex );
+			comboBoxIndex.reset();
+		}
+	}
+	ImGui::End();
+	// imgui box attribute control windows
+	for( auto id : boxControlIds )
+	{
+		boxes[id]->SpawnControlWindow( id, wnd.Gfx() );
+	}
 
 	//Present Frame
 	wnd.Gfx().EndFrame();

@@ -12,26 +12,14 @@ Cylinder::Cylinder( Graphics& gfx,std::mt19937& rng,
 	:
 	TestObject( gfx,rng,adist,ddist,odist,rdist )
 {
-	namespace dx = DirectX;
 
 	if( !IsStaticInitialized() )
 	{
-		struct Vertex
-		{
-			dx::XMFLOAT3 pos;
-			dx::XMFLOAT3 n;
-		};
-		auto model = Prism::MakeTesselatedIndependentCapNormals<Vertex>( tdist( rng ) );
-
-		AddStaticBind( std::make_unique<VertexBuffer>( gfx,model.vertices ) );
-
 		auto pvs = std::make_unique<VertexShader>( gfx,L"PhongVS.cso" );
 		auto pvsbc = pvs->GetBytecode();
 		AddStaticBind( std::move( pvs ) );
 
 		AddStaticBind( std::make_unique<PixelShader>( gfx,L"IndexedPhongPS.cso" ) );
-
-		AddStaticIndexBuffer( std::make_unique<IndexBuffer>( gfx,model.indices ) );
 
 		const std::vector<D3D11_INPUT_ELEMENT_DESC> ied =
 		{
@@ -44,7 +32,7 @@ Cylinder::Cylinder( Graphics& gfx,std::mt19937& rng,
 
 		struct PSMaterialConstant
 		{
-			dx::XMFLOAT3A colors[6] = {
+			DirectX::XMFLOAT3A colors[6] = {
 				{1.0f,0.0f,0.0f},
 				{0.0f,1.0f,0.0f},
 				{0.0f,0.0f,1.0f},
@@ -57,10 +45,17 @@ Cylinder::Cylinder( Graphics& gfx,std::mt19937& rng,
 		} matConst;
 		AddStaticBind( std::make_unique<PixelConstantBuffer<PSMaterialConstant>>( gfx,matConst,1u ) );
 	}
-	else
+	
+	struct Vertex
 	{
-		SetIndexFromStatic();
-	}
+		DirectX::XMFLOAT3 pos;
+		DirectX::XMFLOAT3 n;
+	};
+	auto model = Prism::MakeTesselatedIndependentCapNormals<Vertex>( tdist( rng ) );
 
+	AddBind( std::make_unique<VertexBuffer>( gfx, model.vertices ) );
+
+	AddIndexBuffer( std::make_unique<IndexBuffer>( gfx, model.indices ) );
+	
 	AddBind( std::make_unique<TransformCbuf>( gfx,*this ) );
 }

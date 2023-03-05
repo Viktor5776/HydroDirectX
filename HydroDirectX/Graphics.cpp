@@ -240,7 +240,7 @@ std::string Graphics::HrException::GetErrorInfo() const noexcept
 
 const char* Graphics::HrException::GetType() const noexcept
 {
-	return "Chili Graphics Exception";
+	return "Hydro Graphics Exception";
 }
 
 HRESULT Graphics::HrException::GetErrorCode() const noexcept
@@ -263,7 +263,7 @@ std::string Graphics::HrException::GetErrorDescription() const noexcept
 
 const char* Graphics::DeviceRemovedException::GetType() const noexcept
 {
-	return "Chili Graphics Exception [Device Removed] (DXGI_ERROR_DEVICE_REMOVED)";
+	return "Hydro Graphics Exception [Device Removed] (DXGI_ERROR_DEVICE_REMOVED)";
 }
 
 Graphics::InfoException::InfoException( int line,const char* file,std::vector<std::string> infoMsgs ) noexcept
