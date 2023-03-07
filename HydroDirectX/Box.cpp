@@ -84,9 +84,12 @@ void Box::SpawnControlWindow( int id, Graphics& gfx ) noexcept
 	bool dirty = false;
 	if( ImGui::Begin( ("Box "s + std::to_string( id )).c_str() ) )
 	{
-		dirty = dirty || ImGui::ColorEdit3( "Material Color", &materialConstants.color.x );
-		dirty = dirty || ImGui::SliderFloat( "Specular Intensity", &materialConstants.specularIntensity, 0.05f, 4.0f, "%.2f", 2 );
-		dirty = dirty || ImGui::SliderFloat( "Specular Power", &materialConstants.specularPower, 1.0f, 200.0f, "%.2f", 2 );
+		
+		bool mc = ImGui::ColorEdit3( "Material Color", &materialConstants.color.x );
+		bool si = ImGui::SliderFloat( "Specular Intensity", &materialConstants.specularIntensity, 0.05f, 4.0f, "%.2f", 2 );
+		bool sp = ImGui::SliderFloat( "Specular Power", &materialConstants.specularPower, 1.0f, 200.0f, "%.2f", 2 );
+
+		dirty = mc || si || sp;
 	}
 	ImGui::End();
 

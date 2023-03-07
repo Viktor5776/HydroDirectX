@@ -120,7 +120,7 @@ void App::DoFrame()
 		{
 			for( int i = 0; i < boxes.size(); i++ )
 			{
-				const bool selected = *comboBoxIndex == i;
+				const bool selected = comboBoxIndex.has_value() ? *comboBoxIndex == i : false;
 				if( ImGui::Selectable( std::to_string( i ).c_str(), selected ) )
 				{
 					comboBoxIndex = i;
