@@ -13,7 +13,8 @@ public:
 		 std::uniform_real_distribution<float>& bdist,
 		 DirectX::XMFLOAT3 material );
 	DirectX::XMMATRIX GetTransformXM() const noexcept override;
-	void SpawnControlWindow( int id, Graphics& gfx ) noexcept;
+	//Returns false if window is close
+	bool SpawnControlWindow( int id, Graphics& gfx ) noexcept;
 private:
 	void SyncMaterial( Graphics& gfx ) noexcept(!IS_DEBUG);
 private:

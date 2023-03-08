@@ -92,6 +92,7 @@ void App::DoFrame()
 	wnd.Gfx().BeginFrame( 0.07f,0.0f,0.12f );
 	light.Bind( wnd.Gfx(),camera.GetMatrix() );
 	
+	//Render Geometry
 	for( auto& d : drawables )
 	{
 		d->Update( wnd.kbd.KeyIsPressed(VK_SPACE) ? 0.0f : dt );
@@ -99,29 +100,40 @@ void App::DoFrame()
 	}
 	light.Draw( wnd.Gfx() );
 
-	//Imgui Window to Control Simulation Speed
+	//Imgui Windows
+	SpawnSimulationWindow();
+	camera.SpawnControlWindow();
+	light.SpawnControlWindow();
+	SpawnBoxWindowManagerWindow();
+	SpawnBoxWindows();
+
+	//Present Frame
+	wnd.Gfx().EndFrame();
+}
+
+void App::SpawnSimulationWindow() noexcept
+{
 	if( ImGui::Begin( "Simulation Speed" ) )
 	{
-		ImGui::SliderFloat( "Speed Factor",&speed_factor,-5.0f,5.0f );
-		ImGui::Text( "Application average %.3f ms/frame (%.1f FPS)",1000.0f / ImGui::GetIO().Framerate,ImGui::GetIO().Framerate );
+		ImGui::SliderFloat( "Speed Factor",&speed_factor,0.0f,6.0f,"%.4f",3.2f );
+		ImGui::Text( "%.3f ms/frame (%.1f FPS)",1000.0f / ImGui::GetIO().Framerate,ImGui::GetIO().Framerate );
 		ImGui::Text( "Status: %s",wnd.kbd.KeyIsPressed( VK_SPACE ) ? "PAUSED" : "RUNNING (hold spacebar to pause)" );
 	}
 	ImGui::End();
+}
 
-	//Imgui Window to Control Camera And Light
-	camera.SpawnControlWindow();
-	light.SpawnControlWindow();
-	// imgui window to open box windows
+void App::SpawnBoxWindowManagerWindow() noexcept
+{
 	if( ImGui::Begin( "Boxes" ) )
 	{
 		using namespace std::string_literals;
 		const auto preview = comboBoxIndex ? std::to_string( *comboBoxIndex ) : "Choose a box..."s;
-		if( ImGui::BeginCombo( "Box Number", preview.c_str() ) )
+		if( ImGui::BeginCombo( "Box Number",preview.c_str() ) )
 		{
 			for( int i = 0; i < boxes.size(); i++ )
 			{
-				const bool selected = comboBoxIndex.has_value() ? *comboBoxIndex == i : false;
-				if( ImGui::Selectable( std::to_string( i ).c_str(), selected ) )
+				const bool selected = comboBoxIndex ? *comboBoxIndex == i : false;
+				if( ImGui::Selectable( std::to_string( i ).c_str(),selected ) )
 				{
 					comboBoxIndex = i;
 				}
@@ -139,14 +151,21 @@ void App::DoFrame()
 		}
 	}
 	ImGui::End();
-	// imgui box attribute control windows
-	for( auto id : boxControlIds )
-	{
-		boxes[id]->SpawnControlWindow( id, wnd.Gfx() );
-	}
+}
 
-	//Present Frame
-	wnd.Gfx().EndFrame();
+void App::SpawnBoxWindows() noexcept
+{
+	for( auto i = boxControlIds.begin(); i != boxControlIds.end(); )
+	{
+		if( !boxes[*i]->SpawnControlWindow( *i,wnd.Gfx() ) )
+		{
+			i = boxControlIds.erase( i );
+		}
+		else
+		{
+			i++;
+		}
+	}
 }
 
 int App::Go()
