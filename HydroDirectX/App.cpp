@@ -11,6 +11,9 @@
 #include "imgui/imgui_impl_dx11.h"
 #include <memory>
 #include <algorithm>
+#include <assimp\Importer.hpp>
+#include <assimp\scene.h>
+#include <assimp\postprocess.h>
 
 GDIPlusManager gdipm;
 
@@ -19,6 +22,12 @@ App::App()
 	wnd( 800,600,"Hydro DirectX" ),
 	light( wnd.Gfx() )
 {
+	Assimp::Importer imp;
+	auto model = imp.ReadFile( "models\\suzanne.obj",
+		aiProcess_Triangulate |
+		aiProcess_JoinIdenticalVertices
+	);
+
 	class Factory
 	{
 	public:
